@@ -1,0 +1,196 @@
+Terminator = CR;
+LockTimeout = 10000;
+ReplyTimeout = 1000;
+ReadTimeout = 500;
+WriteTimeout = 1000;
+ExtraInput= ignore;
+
+
+#This command is used to cancel automatic output broadcast mode cancel
+CancelBroadcast {
+ out "CA"; 
+}
+
+#get Televac Software version
+SoftVersion     {
+ out "SV"; in "%39c"
+}
+
+#This command is used to mark sensor 2 on the televac
+#This will be the sensor that is broadcasted
+MarkSensor{
+  out "M%d";in "%*1c"
+}
+
+
+
+#This command enables the broadcast of the marked sensor
+#The 020 determines the time of broadcast. It depends on number of sensors
+#to read
+BroadcastSensors {
+  out "A030"; 
+}
+
+#Here we read the raw data all marked sensors in string format
+ReadBroadcastedSensors1 {
+Terminator = ;
+
+   in  "%39c"
+}
+
+
+ReadBroadcastedSensors2 {
+Terminator = ;
+
+   in  "%*39c%39c"
+}
+
+ReadBroadcastedSensors3 {
+Terminator = ;
+
+   in  "%*39c%*39c%39c"
+}
+
+
+
+
+#Here we read the raw data all marked sensors in string format
+ReadSensor1 {
+   in  "1=%e"
+}
+
+
+
+
+
+#This command reads sensor1 coeficcient
+ReadSensor1Coefficient {
+   in  "1=%f%*39c"
+}
+
+#This command reads sensor1 exponent
+ReadSensor1Exponent {
+   in  "1=%*f%f%*39c"
+}
+
+#here we read the second sensor of the televac
+
+#This command reads sensor1 coeficcient
+ReadSensor2Coefficient {
+   in  "%*12c%f%*39c"
+}
+
+#This command reads sensor1 exponent
+ReadSensor2Exponent {
+   in  "%*16c%f%*39c"
+}
+
+
+
+#This command reads sensor1 coeficcient
+ReadSensor3Coefficient {
+   in  "%*22c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor3Exponent {
+   in  "%*26c%f%*39c"
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor4Coefficient {
+   in  "%*32c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor4Exponent {
+   in  "%*36c%f%*39c"
+
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor5Coefficient {
+   in  "%*42c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor5Exponent {
+   in  "%*46c%f%*39c"
+
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor6Coefficient {
+   in  "%*52c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor6Exponent {
+   in  "%*56c%f%*39c"
+
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor7Coefficient {
+   in  "%*62c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor7Exponent {
+   in  "%*66c%f%*39c"
+
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor8Coefficient {
+   in  "%*72c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor8Exponent {
+   in  "%*76c%f%*39c"
+
+}
+
+
+#This command reads sensor1 coeficcient
+ReadSensor9Coefficient {
+   in  "%*82c%f%*39c"
+
+}
+
+#This command reads sensor1 exponent
+ReadSensor9Exponent {
+   in  "%*86c%f%*39c"
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

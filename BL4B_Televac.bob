@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>Televac</name>
+  <actions>
+  </actions>
+  <widget type="label" version="2.0.0">
+    <name>Label_23</name>
+    <text>Mark Sensor</text>
+    <x>68</x>
+    <y>310</y>
+    <width>80</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_6</name>
+    <text>Sensor1</text>
+    <x>10</x>
+    <y>63</y>
+    <width>53</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text_18</name>
+    <pv_name>$(BL):Press1</pv_name>
+    <x>103</x>
+    <y>62</y>
+    <width>82</width>
+    <height>19</height>
+    <precision>2</precision>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+    <wrap_words>false</wrap_words>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_18</name>
+    <text>microns</text>
+    <x>193</x>
+    <y>63</y>
+    <width>50</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_19</name>
+    <text>Sensor2</text>
+    <x>10</x>
+    <y>93</y>
+    <width>53</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text_1</name>
+    <pv_name>$(BL):Press2</pv_name>
+    <x>103</x>
+    <y>92</y>
+    <width>82</width>
+    <height>19</height>
+    <precision>2</precision>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+    <wrap_words>false</wrap_words>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_20</name>
+    <text>microns</text>
+    <x>193</x>
+    <y>93</y>
+    <width>50</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_21</name>
+    <text>Sensor3</text>
+    <x>10</x>
+    <y>123</y>
+    <width>53</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text_2</name>
+    <pv_name>$(BL):Press3</pv_name>
+    <x>103</x>
+    <y>122</y>
+    <width>82</width>
+    <height>19</height>
+    <precision>2</precision>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+    <wrap_words>false</wrap_words>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_22</name>
+    <text>microns</text>
+    <x>193</x>
+    <y>123</y>
+    <width>50</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text Update</name>
+    <pv_name>$(BL):PressRaw1</pv_name>
+    <x>10</x>
+    <y>170</y>
+    <width>578</width>
+    <height>120</height>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Combo Box</name>
+    <pv_name>$(BL):Broadcast</pv_name>
+    <x>390</x>
+    <y>312</y>
+    <width>140</width>
+    <height>20</height>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Entry</name>
+    <pv_name>$(BL):MarkSensor</pv_name>
+    <x>170</x>
+    <y>310</y>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text Update_1</name>
+    <pv_name>$(BL):Counter</pv_name>
+    <x>410</x>
+    <y>350</y>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_24</name>
+    <text>Counter Rst</text>
+    <x>300</x>
+    <y>350</y>
+    <width>75</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_25</name>
+    <text>Rst if no Response</text>
+    <x>27</x>
+    <y>350</y>
+    <width>119</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Entry_1</name>
+    <pv_name>$(BL):WhentoRst</pv_name>
+    <x>170</x>
+    <y>350</y>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_27</name>
+    <text>Brodcast</text>
+    <x>299</x>
+    <y>312</y>
+    <width>56</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Entry_2</name>
+    <pv_name>$(BL):Press1.HIHI</pv_name>
+    <x>275</x>
+    <y>60</y>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Entry_3</name>
+    <pv_name>$(BL):Press2.HIHI</pv_name>
+    <x>275</x>
+    <y>93</y>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Entry_4</name>
+    <pv_name>$(BL):Press3.HIHI</pv_name>
+    <x>275</x>
+    <y>123</y>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Combo Box_1</name>
+    <pv_name>$(BL):Press1AlarmDisable</pv_name>
+    <x>448</x>
+    <y>60</y>
+    <width>140</width>
+    <height>20</height>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Combo Box_2</name>
+    <pv_name>$(BL):Press2AlarmDisable</pv_name>
+    <x>448</x>
+    <y>91</y>
+    <width>140</width>
+    <height>20</height>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Combo Box_3</name>
+    <pv_name>$(BL):Press3AlarmDisable</pv_name>
+    <x>448</x>
+    <y>122</y>
+    <width>140</width>
+    <height>20</height>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>LED</name>
+    <pv_name>$(BL):Press1Alarm</pv_name>
+    <x>395</x>
+    <y>60</y>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>LED_1</name>
+    <pv_name>$(BL):Press2Alarm</pv_name>
+    <x>395</x>
+    <y>93</y>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>LED_2</name>
+    <pv_name>$(BL):Press3Alarm</pv_name>
+    <x>395</x>
+    <y>123</y>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>LED_3</name>
+    <pv_name>$(BL):GlobalAlarm</pv_name>
+    <x>395</x>
+    <y>10</y>
+    <off_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </off_color>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_28</name>
+    <text>Televac Global Alarm</text>
+    <x>230</x>
+    <y>10</y>
+    <width>134</width>
+    <height>16</height>
+    <vertical_alignment>1</vertical_alignment>
+    <auto_size>true</auto_size>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Combo Box_4</name>
+    <pv_name>$(BL):GlobalAlarmDisable</pv_name>
+    <x>448</x>
+    <y>10</y>
+    <width>140</width>
+    <height>20</height>
+  </widget>
+</display>

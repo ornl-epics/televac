@@ -1,0 +1,6 @@
+file televac.template
+{
+pattern {S, TA, DN}
+	{BL4B, Chop, Televac}
+}
+

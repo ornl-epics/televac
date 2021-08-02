@@ -1,0 +1,755 @@
+#Disable Televac Broadcast
+#Get IDN
+#MArk sensors
+#Enable Broadcast
+#Wait for data
+
+record(longout, "$(S):$(TA):$(DN):MarkSensor") {
+  field(DESC, "Mark sensor")
+  field(DTYP, "stream")
+  field(OUT, "@televac.proto MarkSensor televac1")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+
+record(stringin, "$(S):$(TA):$(DN):GetIDN") {
+  field(DESC, "Get version of televac")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto SoftVersion televac1")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+
+record(stringin, "$(S):$(TA):$(DN):PressRaw1") {
+  field(DESC, "Pressure reading from televac raw")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadBroadcastedSensors1 televac1")
+  field(SCAN, "I/O Intr")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+record(stringin, "$(S):$(TA):$(DN):PressRaw2") {
+  field(DESC, "Pressure reading from televac raw2")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadBroadcastedSensors2 televac1")
+  field(SCAN, "I/O Intr")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+
+record(stringin, "$(S):$(TA):$(DN):PressRaw3") {
+  field(DESC, "Pressure reading from televac raw3")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadBroadcastedSensors3 televac1")
+  field(SCAN, "I/O Intr")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+#one record counter
+record (calc, "$(S):$(TA):$(DN):Counter"){
+   field(DESC, "Counter to reset televac")
+   field(INPA, "$(S):$(TA):$(DN):Counter")
+   field(SCAN, "1 second")
+   field(CALC, "A+1")
+   field(EGU, "Seconds")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+#reset counter if a packet is received on PressRaw1
+record (calcout, "$(S):$(TA):$(DN):CounterRst"){
+  field(INPA, "$(S):$(TA):$(DN):PressRaw1 CP NMS")
+  field(CALC, "0")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(S):$(TA):$(DN):Counter")
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+record (ai, "$(S):$(TA):$(DN):WhentoRst"){
+  field(DESC, "SP to reset broadcast")
+  field(PREC, "0")
+  field(EGU, "Seconds")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+
+}
+
+record (calcout, "$(S):$(TA):$(DN):CalcRst"){
+  field(INPA, "$(S):$(TA):$(DN):Counter CP NMS")
+  field(INPB, "$(S):$(TA):$(DN):WhentoRst")
+  field(CALC, "A>B")
+  field(DOPT, "Use CALC")
+  field(OOPT, "When Non-zero")
+  field(OUT, "$(S):$(TA):$(DN):Rst.PROC")                    
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SCAN, "10 second")
+}
+
+
+
+record(seq, "$(S):$(TA):$(DN):Rst") {
+   field(DESC, "Reset Televac")
+   field(DO1, "1")
+   field(LNK1, "$(S):$(TA):$(DN):Broadcast PP NMS")
+   field(DLY1, "0")
+   field(DO2, "0")
+   field(LNK2, "$(S):$(TA):$(DN):Broadcast PP NMS")
+   field(DLY2, "5")
+   info(archive, "Monitor, 00:00:01, VAL")
+}
+
+
+
+
+record (bo, "$(S):$(TA):$(DN):Broadcast"){
+  field(ZNAM, "BroadcastEnabled")
+  field(ONAM, "BroadcastDisabled")
+  info(archive, "Monitor, 00:00:01, VAL")
+
+}
+
+record (calcout, "$(S):$(TA):$(DN):EnableBroadcast"){
+  field(INPA, "$(S):$(TA):$(DN):Broadcast CP")
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Zero")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(DTYP, "stream")
+  field(OUT, "@televac.proto BroadcastSensors televac1")
+
+}
+
+
+record (calcout, "$(S):$(TA):$(DN):DisableBroadcast"){
+  field(INPA, "$(S):$(TA):$(DN):Broadcast CP")
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Non-zero")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(DTYP, "stream")
+  field(OUT, "@televac.proto CancelBroadcast televac1")
+
+}
+
+#*********************************************************************
+##********************************************************************
+##SECTION TO PARSE SENSOR1
+#
+#This section parses the coeficcient using the interrupts of sensor1
+
+record(ai, "$(S):$(TA):$(DN):Press1Coefficient") {
+  field(DESC, "Coefficient sensor1")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor1Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+#Parsing of the exponent of sensor1 and also activates the calc record
+#with a forward link
+
+record(ai, "$(S):$(TA):$(DN):Press1Exponent") {
+  field(DESC, "Exponent sensor1")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor1Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press1Calc")
+}
+
+#this calc record receives the exponent and coefficient and 
+#formats combines the packets to create the exponential notation
+
+record (calcout, "$(S):$(TA):$(DN):Press1Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press1Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press1Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press1 PP")
+}  
+
+#this record receives the exponential notation format fro the cal record
+#I did not set an ADEL because the broadcast mode on the protocol file
+#is too slow. A050 is about 25 second They same applies for MDEL. 
+record(ao, "$(S):$(TA):$(DN):Press1") {
+   field(DESC, "Pressure reading from televac sensor1")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "70")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+
+
+record(ai, "$(S):$(TA):$(DN):Press2Coefficient") {
+  field(DESC, "Coefficient sensor2")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor2Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press2Exponent") {
+  field(DESC, "Exponents sensor2")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor2Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press2Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press2Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press2Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press2Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press2 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press2") {
+   field(DESC, "Pressure reading from televac sensor2")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press3Coefficient") {
+  field(DESC, "Coefficient sensor3")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor3Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press3Exponent") {
+  field(DESC, "Exponents sensor3")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor3Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press3Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press3Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press3Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press3Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press3 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press3") {
+   field(DESC, "Pressure reading from televac sensor3")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+    info(archive, "Monitor, 00:01:00, VAL")
+
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press4Coefficient") {
+  field(DESC, "Coefficient sensor4")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor4Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press4Exponent") {
+  field(DESC, "Exponents sensor4")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor4Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press4Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press4Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press4Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press4Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press4 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press4") {
+   field(DESC, "Pressure reading from televac sensor4")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+
+record(ai, "$(S):$(TA):$(DN):Press5Coefficient") {
+  field(DESC, "Coefficient sensor5")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor5Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press5Exponent") {
+  field(DESC, "Exponents sensor5")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor5Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press5Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press5Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press5Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press5Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press5 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press5") {
+   field(DESC, "Pressure reading from televac sensor5")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press6Coefficient") {
+  field(DESC, "Coefficient sensor6")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor6Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press6Exponent") {
+  field(DESC, "Exponents sensor6")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor6Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press6Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press6Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press6Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press6Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press6 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press6") {
+   field(DESC, "Pressure reading from televac sensor6")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+
+record(ai, "$(S):$(TA):$(DN):Press7Coefficient") {
+  field(DESC, "Coefficient sensor7")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor7Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press7Exponent") {
+  field(DESC, "Exponents sensor7")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor7Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press7Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press7Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press7Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press7Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press7 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press7") {
+   field(DESC, "Pressure reading from televac sensor7")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press8Coefficient") {
+  field(DESC, "Coefficient sensor8")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor8Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press8Exponent") {
+  field(DESC, "Exponents sensor8")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor8Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press8Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press8Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press8Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press8Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press8 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press8") {
+   field(DESC, "Pressure reading from televac sensor8")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+
+record(ai, "$(S):$(TA):$(DN):Press9Coefficient") {
+  field(DESC, "Coefficient sensor9")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor9Coefficient televac1")
+  field(SCAN, "I/O Intr")
+
+}
+
+record(ai, "$(S):$(TA):$(DN):Press9Exponent") {
+  field(DESC, "Exponents sensor9")
+  field(DTYP, "stream")
+  field(INP, "@televac.proto ReadSensor9Exponent televac1")
+  field(SCAN, "I/O Intr")
+  field(FLNK, "$(S):$(TA):$(DN):Press9Calc")
+}
+
+
+
+record (calcout, "$(S):$(TA):$(DN):Press9Calc"){
+  field(INPA, "$(S):$(TA):$(DN):Press9Coefficient CP")
+  field(INPB, " $(S):$(TA):$(DN):Press9Exponent CP")
+  field(CALC, "A*10^B")
+  field(OUT, "$(S):$(TA):$(DN):Press9 PP")
+}
+
+
+record(ao, "$(S):$(TA):$(DN):Press9") {
+   field(DESC, "Pressure reading from televac sensor4")
+   field(SCAN, "Passive")
+   field(HHSV, "MAJOR")
+   field(HIHI, "330")
+   field(EGU,"Micron")
+   field(PREC, "4")
+   info(autosaveFields, "HIHI")
+   info(archive, "Monitor, 00:01:00, VAL")
+
+}
+
+
+#Alarms
+#
+record(bi, "$(S):$(TA):$(DN):Press1AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press1Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press1.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press1AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+
+record(bi, "$(S):$(TA):$(DN):Press2AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press2Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press2.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press2AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+
+record(bi, "$(S):$(TA):$(DN):Press3AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press3Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press3.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press3AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+record(bi, "$(S):$(TA):$(DN):Press4AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press4Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press4.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press4AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+record(bi, "$(S):$(TA):$(DN):Press5AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press5Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press5.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press5AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+record(bi, "$(S):$(TA):$(DN):Press6AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press6Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press6.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press6AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+
+record(bi, "$(S):$(TA):$(DN):Press7AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press7Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press7.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press7AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+record(bi, "$(S):$(TA):$(DN):Press8AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press8Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press8.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press8AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+record(bi, "$(S):$(TA):$(DN):Press9AlarmDisable")
+{
+    field(DESC, "Sensor Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+
+}
+
+
+record(calc, "$(S):$(TA):$(DN):Press9Alarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):Press9.SEVR CP")
+    field(INPB, "$(S):$(TA):$(DN):Press9AlarmDisable CP")
+    field(CALC, "(A=0|B)")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
+
+
+#in this section we and the press ok statuses
+#if any of those show a 0 then the and results in 0
+#and that is lolo a major alarm
+
+record(bi, "$(S):$(TA):$(DN):GlobalAlarmDisable")
+{
+    field(DESC, "Global Alarm Disable")
+    field(ZNAM, "AlarmEnabled")
+    field(ONAM, "AlarmDisabled")
+    info(archive, "monitor, 00:01:00")
+    info(autosaveFields, "VAL")
+    field(OSV, "MINOR") 
+}
+
+
+record(calc, "$(S):$(TA):$(DN):GlobalAlarm")
+{
+    field(INPA, "$(S):$(TA):$(DN):GlobalAlarmDisable CPP")
+    field(INPB, "$(S):$(TA):$(DN):Press1Alarm CPP")
+    field(INPC, "$(S):$(TA):$(DN):Press2Alarm CPP")
+    field(INPD, "$(S):$(TA):$(DN):Press3Alarm CPP")
+    field(INPE, "$(S):$(TA):$(DN):Press4Alarm CPP")
+    field(INPF, "$(S):$(TA):$(DN):Press5Alarm CPP")
+    field(INPG, "$(S):$(TA):$(DN):Press6Alarm CPP")
+    field(INPH, "$(S):$(TA):$(DN):Press7Alarm CPP")
+    field(INPI, "$(S):$(TA):$(DN):Press8Alarm CPP")
+    field(INPJ, "$(S):$(TA):$(DN):Press9Alarm CPP")
+    field(CALC, "A|B&C&D&E&F&G&H&I&J")
+    field(HIHI, "1")
+    field(HHSV, "NO_ALARM")
+    field(LOLO, "0")
+    field(LLSV, "MAJOR")
+    info(archive, "monitor, 00:01:00")
+
+}
+
+
